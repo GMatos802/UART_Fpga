@@ -1,0 +1,7 @@
+hw/tb/build/
+hw/quartus/db/
+hw/quartus/incremental_db/
+hw/quartus/output_files/
+hw/quartus/*.qws
+hw/quartus/*.rpt
+hw/quartus/*.summary
