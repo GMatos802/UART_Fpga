@@ -12,3 +12,9 @@ placa_omdazz/quartus/output_files/
 placa_omdazz/quartus/*.qws
 placa_omdazz/quartus/*.rpt
 placa_omdazz/quartus/*.summary
+placa_omdazz/pin_finder/db/
+placa_omdazz/pin_finder/incremental_db/
+placa_omdazz/pin_finder/output_files/
+placa_omdazz/pin_finder/*.qws
+placa_omdazz/pin_finder/*.rpt
+placa_omdazz/pin_finder/*.summary
