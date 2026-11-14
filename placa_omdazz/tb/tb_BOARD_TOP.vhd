@@ -102,6 +102,9 @@ begin
         wait for 100 us;
 
         confere(led = "1111", "todos os LEDs deveriam iniciar apagados (ativos em '0')");
+        wait until dig = "0111";
+        wait until rising_edge(clk);
+        confere(seg = "10010010", "digito da esquerda (DIG4) deveria mostrar '5', o nibble alto de TX_BYTE");
         confere(uart_txd = '1' and esp_rx2 = '1', "linhas TX deveriam estar em '1' em repouso");
 
         esp32_envia((x"23", x"4C", x"B3"));

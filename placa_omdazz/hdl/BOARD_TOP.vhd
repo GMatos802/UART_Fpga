@@ -38,6 +38,7 @@ architecture structural of BOARD_TOP is
     signal cmd_led  : std_logic;
     signal leds     : std_logic_vector(4 downto 1);
     signal display  : std_logic_vector(15 downto 0);
+    signal dig_i    : std_logic_vector(3 downto 0);
 begin
     rst_i    <= not RESET_N;
     loopback <= not KEY2;
@@ -72,11 +73,12 @@ begin
             clk   => CLK,
             rst   => rst_i,
             value => display,
-            dig   => DIG,
+            dig   => dig_i,
             seg   => SEG
         );
 
     display <= TX_BYTE & data_out;
+    DIG     <= dig_i(0) & dig_i(1) & dig_i(2) & dig_i(3);
 
     leds(1) <= loopback;
     leds(2) <= '0';
