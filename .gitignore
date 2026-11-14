@@ -5,3 +5,10 @@ hw/quartus/output_files/
 hw/quartus/*.qws
 hw/quartus/*.rpt
 hw/quartus/*.summary
+placa_omdazz/tb/build/
+placa_omdazz/quartus/db/
+placa_omdazz/quartus/incremental_db/
+placa_omdazz/quartus/output_files/
+placa_omdazz/quartus/*.qws
+placa_omdazz/quartus/*.rpt
+placa_omdazz/quartus/*.summary

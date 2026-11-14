@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Teste UART FPGA</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #f4f4f5; color: #18181b; margin: 0; padding: 16px; }
+  main { max-width: 560px; margin: auto; }
+  h1 { font-size: 1.3rem; }
+  .card { background: #fff; border-radius: 10px; padding: 14px; margin-bottom: 14px; box-shadow: 0 1px 3px #0002; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input, button { font-size: 1rem; padding: 8px 12px; border-radius: 6px; border: 1px solid #ccc; }
+  input { flex: 1; min-width: 0; }
+  button { background: #2563eb; color: #fff; border: none; cursor: pointer; }
+  button.off { background: #52525b; }
+  button:disabled { opacity: .5; cursor: default; }
+  #lamp { width: 36px; height: 36px; border-radius: 50%; background: #3f3f46; border: 2px solid #18181b; }
+  #lamp.on { background: #ef4444; box-shadow: 0 0 16px #ef4444; }
+  #log { font-family: ui-monospace, monospace; font-size: .85rem; height: 260px; overflow: auto;
+         background: #18181b; color: #e4e4e7; padding: 8px; border-radius: 6px; }
+  .tx { color: #60a5fa; } .rx { color: #4ade80; } .er { color: #f87171; } .info { color: #a1a1aa; }
+  small { color: #71717a; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Teste UART: navegador &rarr; ESP32 &rarr; FPGA</h1>
+
+  <div class="card">
+    <b>1. ESP32</b>
+    <div class="row" style="margin-top:8px">
+      <input id="addr" value="http://192.168.4.1">
+      <button id="ping">Testar conex&atilde;o</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>2. LED da FPGA (LEDR9)</b>
+    <div class="row" style="margin-top:8px">
+      <div id="lamp"></div>
+      <button id="on">Ligar</button>
+      <button id="off" class="off">Desligar</button>
+      <span id="ledtxt">estado desconhecido</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>3. Bytes livres (hex)</b>
+    <div class="row" style="margin-top:8px">
+      <input id="hex" placeholder="ex.: 23 4C 00  (pacote com checagem errada)">
+      <button id="sendhex">Enviar</button>
+    </div>
+    <small>Pacotes: ligar = 23 4C B3, desligar = 23 44 BB. Respostas: 31 ('1') ligado, 30 ('0') desligado, 45 ('E') erro.</small>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <b>Log</b><button class="off" id="clear">Limpar</button>
+    </div>
+    <div id="log"></div>
+  </div>
+</main>
+
+<script>
+  const $ = id => document.getElementById(id);
+  let since = null;
+
+  try { $('addr').value = localStorage.getItem('esp32') || $('addr').value; } catch (e) {}
+  $('addr').onchange = () => { try { localStorage.setItem('esp32', base()); } catch (e) {} since = null; };
+
+  function base() { return $('addr').value.trim().replace(/\/+$/, ''); }
+  function hex(bytes) { return bytes.map(b => b.toString(16).toUpperCase().padStart(2, '0')).join(' '); }
+  function txt(bytes) { return bytes.map(b => b >= 32 && b < 127 ? String.fromCharCode(b) : '.').join(''); }
+
+  function log(cls, msg) {
+    const d = document.createElement('div');
+    d.className = cls;
+    d.textContent = new Date().toLocaleTimeString() + '  ' + msg;
+    $('log').appendChild(d);
+    $('log').scrollTop = $('log').scrollHeight;
+  }
+
+  function showLed(state) {
+    $('lamp').className = state === 'on' ? 'on' : '';
+    $('ledtxt').textContent = state === 'on' ? 'ligado' : state === 'off' ? 'desligado' : 'estado desconhecido';
+  }
+
+  async function call(path, body) {
+    const opts = body ? { method: 'POST', body: new URLSearchParams(body) } : {};
+    const r = await fetch(base() + path, opts);
+    return [r.ok, await r.json()];
+  }
+
+  async function ping() {
+    try {
+      const [ok, j] = await call('/');
+      log(ok ? 'info' : 'er', ok ? 'ESP32 conectado' : 'erro: ' + j.error);
+    } catch (e) {
+      log('er', 'sem conexao com ' + base());
+    }
+  }
+
+  async function led(state) {
+    $('on').disabled = $('off').disabled = true;
+    try {
+      const [ok, j] = await call('/led', { state });
+      if (j.sent) log('tx', 'TX > ' + hex(j.sent) + '  (' + (state === 'on' ? 'ligar' : 'desligar') + ')');
+      if (ok) {
+        log('rx', 'FPGA confirmou: LED ' + (j.led === 'on' ? 'ligado' : 'desligado'));
+        showLed(j.led);
+      } else {
+        log('er', 'erro: ' + j.error + (j.resp !== undefined ? ' (resposta 0x' + hex([j.resp]) + ')' : ''));
+      }
+    } catch (e) {
+      log('er', 'sem conexao com ' + base());
+    }
+    $('on').disabled = $('off').disabled = false;
+  }
+
+  async function sendHex() {
+    const data = $('hex').value.trim();
+    if (!data) return;
+    try {
+      const [ok, j] = await call('/send', { mode: 'hex', data });
+      log(ok ? 'tx' : 'er', ok ? 'TX > ' + hex(j.sent) : 'erro: ' + j.error);
+    } catch (e) {
+      log('er', 'sem conexao com ' + base());
+    }
+  }
+
+  async function poll() {
+    try {
+      const [ok, j] = await call('/rx?since=' + (since ?? 0));
+      if (ok) {
+        if (since !== null && j.bytes.length) log('rx', 'RX < ' + hex(j.bytes) + '  |' + txt(j.bytes) + '|');
+        since = j.total;
+      }
+    } catch (e) {}
+    setTimeout(poll, 500);
+  }
+
+  $('ping').onclick = ping;
+  $('on').onclick = () => led('on');
+  $('off').onclick = () => led('off');
+  $('sendhex').onclick = sendHex;
+  $('hex').addEventListener('keydown', e => { if (e.key === 'Enter') sendHex(); });
+  $('clear').onclick = () => $('log').innerHTML = '';
+  poll();
+</script>
+</body>
+</html>

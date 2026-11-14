@@ -1,0 +1,78 @@
+set_global_assignment -name FAMILY "Cyclone IV E"
+set_global_assignment -name DEVICE EP4CE6E22C8
+set_global_assignment -name TOP_LEVEL_ENTITY BOARD_TOP
+set_global_assignment -name VHDL_INPUT_VERSION VHDL_2008
+set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
+set_global_assignment -name SDC_FILE uart_omdazz.sdc
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_WEAK_PULLUP "AS INPUT TRI-STATED WITH WEAK PULL-UP"
+set_global_assignment -name CYCLONEII_RESERVE_NCEO_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA0_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DATA1_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_FLASH_NCE_AFTER_CONFIGURATION "USE AS REGULAR IO"
+set_global_assignment -name RESERVE_DCLK_AFTER_CONFIGURATION "USE AS REGULAR IO"
+
+set_global_assignment -name VHDL_FILE ../../hw/hdl/UART_TX.vhd
+set_global_assignment -name VHDL_FILE ../../hw/hdl/UART_RX.vhd
+set_global_assignment -name VHDL_FILE ../../hw/hdl/CMD_EXEC.vhd
+set_global_assignment -name VHDL_FILE ../../hw/hdl/UART_TOP.vhd
+set_global_assignment -name VHDL_FILE ../hdl/SEG7_SCAN.vhd
+set_global_assignment -name VHDL_FILE ../hdl/BOARD_TOP.vhd
+
+set_location_assignment PIN_23 -to CLK
+set_location_assignment PIN_25 -to RESET_N
+set_location_assignment PIN_88 -to KEY1
+set_location_assignment PIN_89 -to KEY2
+set_location_assignment PIN_87 -to LED[1]
+set_location_assignment PIN_86 -to LED[2]
+set_location_assignment PIN_85 -to LED[3]
+set_location_assignment PIN_84 -to LED[4]
+set_location_assignment PIN_133 -to DIG[1]
+set_location_assignment PIN_135 -to DIG[2]
+set_location_assignment PIN_136 -to DIG[3]
+set_location_assignment PIN_137 -to DIG[4]
+set_location_assignment PIN_128 -to SEG[0]
+set_location_assignment PIN_121 -to SEG[1]
+set_location_assignment PIN_125 -to SEG[2]
+set_location_assignment PIN_129 -to SEG[3]
+set_location_assignment PIN_132 -to SEG[4]
+set_location_assignment PIN_126 -to SEG[5]
+set_location_assignment PIN_124 -to SEG[6]
+set_location_assignment PIN_127 -to SEG[7]
+set_location_assignment PIN_114 -to UART_TXD
+set_location_assignment PIN_115 -to UART_RXD
+set_location_assignment PIN_142 -to ESP32_TX2
+set_location_assignment PIN_1 -to ESP32_RX2
+set_location_assignment PIN_144 -to DBG_RX_SAMPLE
+set_location_assignment PIN_3 -to DBG_RX_READY
+set_location_assignment PIN_2 -to DBG_TX_BUSY
+
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to CLK
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to RESET_N
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY1
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to KEY2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LED[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DIG[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DIG[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DIG[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DIG[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to SEG[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART_TXD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to UART_RXD
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ESP32_TX2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to ESP32_RX2
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DBG_RX_SAMPLE
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DBG_RX_READY
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to DBG_TX_BUSY
+
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to ESP32_TX2
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to UART_RXD

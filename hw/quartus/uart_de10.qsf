@@ -7,15 +7,19 @@ set_global_assignment -name SDC_FILE uart_de10.sdc
 
 set_global_assignment -name VHDL_FILE ../hdl/UART_TX.vhd
 set_global_assignment -name VHDL_FILE ../hdl/UART_RX.vhd
+set_global_assignment -name VHDL_FILE ../hdl/CMD_EXEC.vhd
 set_global_assignment -name VHDL_FILE ../hdl/UART_TOP.vhd
 
 set_location_assignment PIN_P11 -to clk
 set_location_assignment PIN_B8 -to rst
 set_location_assignment PIN_A7 -to tx_start
+set_location_assignment PIN_F15 -to loopback
+set_location_assignment PIN_W10 -to rx_ext
 set_location_assignment PIN_V10 -to tx_out
 set_location_assignment PIN_W9 -to rx_sample
+set_location_assignment PIN_V8 -to rx_ready
 set_location_assignment PIN_A11 -to tx_busy
-set_location_assignment PIN_B11 -to rx_ready
+set_location_assignment PIN_B11 -to led
 set_location_assignment PIN_C10 -to data_in[0]
 set_location_assignment PIN_C11 -to data_in[1]
 set_location_assignment PIN_D12 -to data_in[2]
@@ -36,10 +40,13 @@ set_location_assignment PIN_D14 -to data_out[7]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk
 set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to rst
 set_instance_assignment -name IO_STANDARD "3.3 V SCHMITT TRIGGER" -to tx_start
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to loopback
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_ext
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to tx_out
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_sample
-set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to tx_busy
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rx_ready
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to tx_busy
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to led
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_in[0]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_in[1]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_in[2]
@@ -56,3 +63,5 @@ set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_out[4]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_out[5]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_out[6]
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to data_out[7]
+
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to rx_ext
