@@ -110,8 +110,9 @@
         log('rx', 'FPGA confirmou: LED ' + (j.led === 'on' ? 'ligado' : 'desligado'));
         showLed(j.led);
       } else {
-        log('er', 'erro: ' + j.error + (j.resp !== undefined ? ' (resposta 0x' + hex([j.resp]) + ')' : ''));
+        log('er', 'erro: ' + (j.error || 'resposta inesperada') + (j.resp !== undefined ? ' (resposta 0x' + hex([j.resp]) + ')' : ''));
       }
+      if (j.ignored) log('info', j.ignored + ' byte(s) de ruido ignorado(s) antes da resposta');
     } catch (e) {
       log('er', 'sem conexao com ' + base());
     }

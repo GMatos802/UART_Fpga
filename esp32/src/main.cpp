@@ -119,21 +119,37 @@ static void handleLed() {
   sendToFpga(pkt, sizeof(pkt));
 
   uint32_t t0 = millis();
-  while (rxTotal == before && millis() - t0 < RESP_TIMEOUT_MS) {
+  uint32_t idx = before;
+  int resp = -1;
+  uint32_t ignored = 0;
+  while (resp < 0 && millis() - t0 < RESP_TIMEOUT_MS) {
     pumpRx();
-    delay(1);
+    while (resp < 0 && idx < rxTotal) {
+      uint8_t b = rxBuf[idx % RX_BUF_SIZE];
+      if (b == RESP_ON || b == RESP_OFF || b == RESP_ERR) {
+        resp = b;
+      } else {
+        ignored++;
+        Serial.printf("Ignorado (nao e resposta): 0x%02X\n", b);
+      }
+      idx++;
+    }
+    if (resp < 0) delay(1);
   }
 
-  if (rxTotal == before) {
-    reply(504, "{\"ok\":false,\"error\":\"FPGA nao respondeu\",\"sent\":" + bytesJson(pkt, 3) + "}");
+  String sent = bytesJson(pkt, 3);
+  if (resp < 0) {
+    String msg = rxTotal == before ? "FPGA nao respondeu" : "FPGA enviou bytes que nao sao resposta valida";
+    reply(504, "{\"ok\":false,\"error\":\"" + msg + "\",\"ignored\":" + String(ignored) + ",\"sent\":" + sent + "}");
     return;
   }
 
-  uint8_t resp = rxBuf[(rxTotal - 1) % RX_BUF_SIZE];
   String led = resp == RESP_ON ? "on" : resp == RESP_OFF ? "off" : "?";
   bool ok = (cmd == CMD_LED_ON && resp == RESP_ON) || (cmd == CMD_LED_OFF && resp == RESP_OFF);
-  reply(ok ? 200 : 502, String("{\"ok\":") + (ok ? "true" : "false") + ",\"led\":\"" + led +
-                            "\",\"resp\":" + String(resp) + ",\"sent\":" + bytesJson(pkt, 3) + "}");
+  String err = resp == RESP_ERR ? "FPGA rejeitou o pacote (resposta E)" : "resposta inesperada do FPGA";
+  reply(ok ? 200 : 502, String("{\"ok\":") + (ok ? "true" : "false") + ",\"led\":\"" + led + "\",\"resp\":" +
+                            String(resp) + ",\"ignored\":" + String(ignored) + ",\"sent\":" + sent +
+                            (ok ? "" : ",\"error\":\"" + err + "\"") + "}");
 }
 
 static void handleSend() {
